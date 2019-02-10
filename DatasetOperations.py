@@ -125,3 +125,33 @@ class DataSet(object):
 
     return self._images[start:end], self._labels[start:end], self._ids[start:end], self._cls[start:end]
 
+def read_train_sets(train_path, image_size, classes, validation_size=0):
+  class DataSets(object):
+    pass
+  data_sets = DataSets()
+
+  images, labels, ids, cls = load_train(train_path, image_size, classes)
+  images, labels, ids, cls = shuffle(images, labels, ids, cls)  # shuffle the data
+
+  if isinstance(validation_size, float):
+    validation_size = int(validation_size * images.shape[0])
+
+  validation_images = images[:validation_size]
+  validation_labels = labels[:validation_size]
+  validation_ids = ids[:validation_size]
+  validation_cls = cls[:validation_size]
+
+  train_images = images[validation_size:]
+  train_labels = labels[validation_size:]
+  train_ids = ids[validation_size:]
+  train_cls = cls[validation_size:]
+
+  data_sets.train = DataSet(train_images, train_labels, train_ids, train_cls)
+  data_sets.valid = DataSet(validation_images, validation_labels, validation_ids, validation_cls)
+
+  return data_sets
+
+
+def read_test_set(test_path, image_size):
+  images, ids  = load_test(test_path, image_size)
+  return images, ids
