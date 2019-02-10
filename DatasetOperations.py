@@ -11,7 +11,7 @@ def load_train(train_path, image_size, classes):
     cls = []
 
     print('Reading training images')
-    for fld in classes:   # assuming data directory has a separate folder for each class, and that each folder is named after the class
+    for fld in classes:
         index = classes.index(fld)
         print('Loading {} files (Index: {})'.format(fld, index))
         path = os.path.join(train_path, fld, '*g')
@@ -32,3 +32,27 @@ def load_train(train_path, image_size, classes):
     cls = np.array(cls)
 
     return images, labels, ids, cls
+
+
+def load_test(test_path, image_size):
+  path = os.path.join(test_path, '*g')
+  files = sorted(glob.glob(path))
+
+  X_test = []
+  X_test_id = []
+  print("Reading test images")
+  for fl in files:
+      flbase = os.path.basename(fl)
+      img = cv2.imread(fl)
+      img = cv2.resize(img, (image_size, image_size), cv2.INTER_LINEAR)
+      X_test.append(img)
+      X_test_id.append(flbase)
+
+  ### because we're not creating a DataSet object for the test images, normalization happens here
+  X_test = np.array(X_test, dtype=np.uint8)
+  X_test = X_test.astype('float32')
+  X_test = X_test / 255
+
+  return X_test, X_test_id
+
+
