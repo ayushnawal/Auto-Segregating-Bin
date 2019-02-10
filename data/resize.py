@@ -7,7 +7,7 @@ def resize(image, dim1, dim2):
 	return misc.imresize(image, (dim1, dim2))
 
 def fileWalk(directory, destPath):
-	try: 
+	try:
 		os.makedirs(destPath)
 	except OSError:
 		if not os.path.isdir(destPath):
@@ -26,7 +26,7 @@ def fileWalk(directory, destPath):
 
 			picResized = resize(pic,constants.DIM1, constants.DIM2)
 			misc.imsave(os.path.join(destPath, file), picResized)
-		
+
 
 def main():
 	prepath = os.path.join(os.getcwd(), 'dataset-original')
@@ -38,7 +38,7 @@ def main():
 	trashDir = os.path.join(prepath, 'trash')
 
 	destPath = os.path.join(os.getcwd(), 'dataset-resized')
-	try: 
+	try:
 		os.makedirs(destPath)
 	except OSError:
 		if not os.path.isdir(destPath):
@@ -60,7 +60,7 @@ def main():
 	fileWalk(metalDir, os.path.join(destPath, 'metal'))
 
 	#TRASH
-	fileWalk(trashDir, os.path.join(destPath, 'trash'))  
+	fileWalk(trashDir, os.path.join(destPath, 'trash'))
 
 if __name__ == '__main__':
     main()
