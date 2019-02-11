@@ -114,4 +114,80 @@ images, cls_true  = data.train.images, data.train.cls
 # Plot the images and labels using our helper-function above.
 plot_images(images=images, cls_true=cls_true)
 
+## Helper-functions for creating new variables
+def new_weights(shape):
+    return tf.Variable(tf.truncated_normal(shape, stddev=0.05))
+def new_biases(length):
+    return tf.Variable(tf.constant(0.05, shape=[length]))
+
+## Helper-function for creating a new Convolutional Layer
+def new_conv_layer(input,
+                   num_input_channels, # Num. channels in prev. layer.
+                   filter_size,
+                   num_filters,
+                   use_pooling=True):
+
+    shape = [filter_size, filter_size, num_input_channels, num_filters]
+
+    weights = new_weights(shape=shape)
+
+    biases = new_biases(length=num_filters)
+
+    layer = tf.nn.conv2d(input=input,
+                         filter=weights,
+                         strides=[1, 1, 1, 1],
+                         padding='SAME')
+
+    # A bias-value is added to each filter-channel.
+    layer += biases
+
+    if use_pooling:
+        # in each window. Then we move 2 pixels to the next window.
+        layer = tf.nn.max_pool(value=layer,
+                               ksize=[1, 2, 2, 1],
+                               strides=[1, 2, 2, 1],
+                               padding='SAME')
+
+    layer = tf.nn.relu(layer)
+
+    return layer, weights
+
+## Flattening layer
+def flatten_layer(layer):
+
+    layer_shape = layer.get_shape()
+
+    num_features = layer_shape[1:4].num_elements()
+
+    layer_flat = tf.reshape(layer, [-1, num_features])
+
+    return layer_flat, num_features
+
+## Fully-Connected layer
+def new_fc_layer(input,
+                 num_inputs,
+                 num_outputs,
+                 use_relu=True):
+
+    weights = new_weights(shape=[num_inputs, num_outputs])
+    biases = new_biases(length=num_outputs)
+
+    layer = tf.matmul(input, weights) + biases
+
+    if use_relu:
+        layer = tf.nn.relu(layer)
+
+    return layer
+
+
+
+
+
+
+
+
+
+
+
+
 
