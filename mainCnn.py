@@ -259,8 +259,154 @@ correct_prediction = tf.equal(y_pred_cls, y_true_cls)
 
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
+## Tensor Flow RUN
+session = tf.Session()
 
+session.run(tf.initialize_all_variables())
 
+## Helper-function to optimize iterations
+train_batch_size = batch_size
+
+def print_progress(epoch, feed_dict_train, feed_dict_validate, val_loss):
+    # Calculate the accuracy on the training-set.
+    acc = session.run(accuracy, feed_dict=feed_dict_train)
+    val_acc = session.run(accuracy, feed_dict=feed_dict_validate)
+    msg = "Epoch {0} --- Training Accuracy: {1:>6.1%}, Validation Accuracy: {2:>6.1%}, Validation Loss: {3:.3f}"
+    print(msg.format(epoch + 1, acc, val_acc, val_loss))
+
+# Counter for total number of iterations performed so far.
+total_iterations = 0
+
+def optimize(num_iterations):
+
+    global total_iterations
+
+    start_time = time.time()
+
+    best_val_loss = float("inf")
+    patience = 0
+
+    for i in range(total_iterations,
+                   total_iterations + num_iterations):
+
+        x_batch, y_true_batch, _, cls_batch = data.train.next_batch(train_batch_size)
+        x_valid_batch, y_valid_batch, _, valid_cls_batch = data.valid.next_batch(train_batch_size)
+
+        x_batch = x_batch.reshape(train_batch_size, img_size_flat)
+        x_valid_batch = x_valid_batch.reshape(train_batch_size, img_size_flat)
+
+        feed_dict_train = {x: x_batch,
+                           y_true: y_true_batch}
+
+        feed_dict_validate = {x: x_valid_batch,
+                              y_true: y_valid_batch}
+
+        session.run(optimizer, feed_dict=feed_dict_train)
+
+        if i % int(data.train.num_examples/batch_size) == 0:
+            val_loss = session.run(cost, feed_dict=feed_dict_validate)
+            epoch = int(i / int(data.train.num_examples/batch_size))
+
+            print_progress(epoch, feed_dict_train, feed_dict_validate, val_loss)
+
+            if early_stopping:
+                if val_loss < best_val_loss:
+                    best_val_loss = val_loss
+                    patience = 0
+                else:
+                    patience += 1
+
+                if patience == early_stopping:
+                    break
+
+    total_iterations += num_iterations
+
+    end_time = time.time()
+
+    time_dif = end_time - start_time
+
+    print("Time elapsed: " + str(timedelta(seconds=int(round(time_dif)))))
+
+## function to plot example errors
+def plot_example_errors(cls_pred, correct):
+
+    incorrect = (correct == False)
+
+    images = data.valid.images[incorrect]
+
+    cls_pred = cls_pred[incorrect]
+
+    cls_true = data.valid.cls[incorrect]
+
+    plot_images(images=images[0:9],
+                cls_true=cls_true[0:9],
+                cls_pred=cls_pred[0:9])
+
+## function to plot confusion matrix
+def plot_confusion_matrix(cls_pred):
+
+    cls_true = data.valid.cls
+
+    cm = confusion_matrix(y_true=cls_true,
+                          y_pred=cls_pred)
+
+    print(cm)
+
+    plt.matshow(cm)
+
+    plt.colorbar()
+    tick_marks = np.arange(num_classes)
+    plt.xticks(tick_marks, range(num_classes))
+    plt.yticks(tick_marks, range(num_classes))
+    plt.xlabel('Predicted')
+    plt.ylabel('True')
+
+    plt.show()
+
+## function for showing performance
+def print_validation_accuracy(show_example_errors=False,
+                        show_confusion_matrix=False):
+
+    num_test = len(data.valid.images)
+
+    cls_pred = np.zeros(shape=num_test, dtype=np.int)
+
+    i = 0
+
+    while i < num_test:
+
+        j = min(i + batch_size, num_test)
+
+        images = data.valid.images[i:j, :].reshape(batch_size, img_size_flat)
+
+        labels = data.valid.labels[i:j, :]
+
+        feed_dict = {x: images,
+                     y_true: labels}
+
+        cls_pred[i:j] = session.run(y_pred_cls, feed_dict=feed_dict)
+
+        i = j
+
+    cls_true = np.array(data.valid.cls)
+    cls_pred = np.array([classes[x] for x in cls_pred])
+
+    correct = (cls_true == cls_pred)
+
+    correct_sum = correct.sum()
+
+    acc = float(correct_sum) / num_test
+
+    msg = "Accuracy on Test-Set: {0:.1%} ({1} / {2})"
+    print(msg.format(acc, correct_sum, num_test))
+
+    if show_example_errors:
+        print("Example errors:")
+        plot_example_errors(cls_pred=cls_pred, correct=correct)
+
+    if show_confusion_matrix:
+        print("Confusion Matrix:")
+        plot_confusion_matrix(cls_pred=cls_pred)
 
 
 
