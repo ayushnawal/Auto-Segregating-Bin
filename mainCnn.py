@@ -179,6 +179,94 @@ def new_fc_layer(input,
 
     return layer
 
+## Place-holder variables
+x = tf.placeholder(tf.float32, shape=[None, img_size_flat], name='x')
+
+x_image = tf.reshape(x, [-1, img_size, img_size, num_channels])
+
+y_true = tf.placeholder(tf.float32, shape=[None, num_classes], name='y_true')
+
+y_true_cls = tf.argmax(y_true, dimension=1)
+
+## Convolutional Layer 1
+layer_conv1, weights_conv1 = \
+    new_conv_layer(input=x_image,
+                   num_input_channels=num_channels,
+                   filter_size=filter_size1,
+                   num_filters=num_filters1,
+                   use_pooling=True)
+
+layer_conv1
+
+## Convolutional Layer 2 & 3
+layer_conv2, weights_conv2 = \
+    new_conv_layer(input=layer_conv1,
+                   num_input_channels=num_filters1,
+                   filter_size=filter_size2,
+                   num_filters=num_filters2,
+                   use_pooling=True)
+
+
+layer_conv2
+
+layer_conv3, weights_conv3 = \
+    new_conv_layer(input=layer_conv2,
+                   num_input_channels=num_filters2,
+                   filter_size=filter_size3,
+                   num_filters=num_filters3,
+                   use_pooling=True)
+
+layer_conv3
+
+## Flatten layer
+layer_flat, num_features = flatten_layer(layer_conv3)
+
+layer_flat
+
+num_features
+
+## Fully-connected layer 1 & 2
+layer_fc1 = new_fc_layer(input=layer_flat,
+                         num_inputs=num_features,
+                         num_outputs=fc_size,
+                         use_relu=True)
+
+layer_fc1
+
+layer_fc2 = new_fc_layer(input=layer_fc1,
+                         num_inputs=fc_size,
+                         num_outputs=num_classes,
+                         use_relu=False)
+
+layer_fc2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
