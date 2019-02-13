@@ -408,8 +408,23 @@ def print_validation_accuracy(show_example_errors=False,
         print("Confusion Matrix:")
         plot_confusion_matrix(cls_pred=cls_pred)
 
+## after 1 optimization iteration
+optimize(num_iterations=1)
+print_validation_accuracy()
 
+## after 100 optimization iteration
+optimizeoptimize(num_iterations=99)
+print_validation_accuracy(show_example_errors=True)
 
+## after 1000 optimization iteration
+optimize(num_iterations=900)
+print_validation_accuracy(show_example_errors=True)
+
+## after 10000 optimization iteration
+optimize(num_iterations=9000)
+print_validation_accuracy(show_example_errors=True, show_confusion_matrix=True)
+
+session.close()
 
 
 
