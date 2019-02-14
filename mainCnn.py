@@ -12,7 +12,7 @@ import cv2
 from sklearn.metrics import confusion_matrix
 from datetime import timedelta
 
-%matplotlib inline
+##%matplotlib inline
 
 ## CONFIGURATION
 
@@ -55,18 +55,18 @@ validation_size = .16
 
 early_stopping = None  # use None if you don't want to implement early stoping
 
-train_path = 'data/dataset-resized/'
+train_path = './data/dataset-resized/'
 # test_path = 'data/'
 # checkpoint_dir = "models/"
 
 ## LOAD DATA
 
-data = dataset.read_train_sets(train_path, img_size, classes, validation_size=validation_size)
-test_images, test_ids = dataset.read_test_set(test_path, img_size)
+data = DatasetOperations.read_train_sets(train_path, img_size, classes, validation_size=validation_size)
+#test_images, test_ids = DatasetOperations.read_test_set(test_path, img_size)
 
 print("Size of:")
 print("- Training-set:\t\t{}".format(len(data.train.labels)))
-print("- Test-set:\t\t{}".format(len(test_images)))
+#print("- Test-set:\t\t{}".format(len(test_images)))
 print("- Validation-set:\t{}".format(len(data.valid.labels)))
 
 ## Helper-function for plotting images
@@ -410,19 +410,19 @@ def print_validation_accuracy(show_example_errors=False,
 
 ## after 1 optimization iteration
 optimize(num_iterations=1)
-print_validation_accuracy()
+#print_validation_accuracy()
 
 ## after 100 optimization iteration
-optimizeoptimize(num_iterations=99)
-print_validation_accuracy(show_example_errors=True)
+optimize(num_iterations=99)
+##print_validation_accuracy(show_example_errors=True)
 
 ## after 1000 optimization iteration
 optimize(num_iterations=900)
-print_validation_accuracy(show_example_errors=True)
+##print_validation_accuracy(show_example_errors=True)
 
 ## after 10000 optimization iteration
 optimize(num_iterations=9000)
-print_validation_accuracy(show_example_errors=True, show_confusion_matrix=True)
+##print_validation_accuracy(show_example_errors=True, show_confusion_matrix=True)
 
 session.close()
 

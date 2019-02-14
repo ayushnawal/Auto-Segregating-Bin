@@ -16,9 +16,11 @@ def load_train(train_path, image_size, classes):
         print('Loading {} files (Index: {})'.format(fld, index))
         path = os.path.join(train_path, fld, '*g')
         files = glob.glob(path)
+
         for fl in files:
+            print(fl)
             image = cv2.imread(fl)
-            image = cv2.resize(image, (image_size, image_size), cv2.INTER_LINEAR)
+            image = cv2.resize(image, (image_size, image_size), interpolation = cv2.INTER_LINEAR)
             images.append(image)
             label = np.zeros(len(classes))
             label[index] = 1.0
